@@ -1,0 +1,40 @@
+# Task Log
+
+## 2026-04-07
+- Đọc `Agent_skill/AnHy_Skill.md` và tiếp tục theo style An Hy Candle: pastel beige, hồng nhạt, nâu ấm.
+- Nối router frontend cho trang chủ, danh sách sản phẩm, chi tiết sản phẩm và checkout.
+- Sửa giỏ hàng để hỗ trợ cả dữ liệu mock `id` và dữ liệu MongoDB `_id`.
+- Thêm Google/Facebook OAuth routes ở backend và nút đăng nhập OAuth thật trên frontend, chờ cấu hình provider credentials.
+- Gỡ nút tạo admin lần đầu khỏi `/auth`; backend tự đảm bảo admin mặc định `admin/admin123` khi server chạy với MongoDB.
+- Thêm API và form client profile để lưu thông tin cá nhân/địa chỉ vào CSDL, kèm đổi mật khẩu.
+- Thêm chức năng admin sửa tài khoản, phân quyền và đặt lại mật khẩu người dùng.
+- Sửa lỗi login treo do MongoDB buffering timeout: giảm timeout kết nối, seed admin sau khi DB kết nối, thêm fallback admin login cho `admin/admin123` và `admin@gmail.com/admin123`.
+- Đổi theme sang hồng kem/hồng đào gần mẫu Kindled hơn, bớt nâu đậm.
+- Thêm fallback dev cho Google/Facebook OAuth khi chưa cấu hình provider credentials để nút không bị đứng ở local.
+- Bổ sung upload ảnh sản phẩm qua backend bằng Multer, lưu vào `BE/uploads/products`, trả URL `/uploads/products/...` và lưu URL vào MongoDB.
+- Sửa form Admin Dashboard để chọn file JPG/PNG/WebP, preview ảnh, hoặc dán URL ảnh ngoài; cảnh báo ảnh iPhone HEIC vì web không hiển thị ổn.
+- Tăng responsive mobile cho hero, nav, product grid/card, form, admin table, preview ảnh và nút Zalo.
+- Đã kiểm tra `npm run lint`, `npm run build`, `node --check BE/server.js`, `node --check BE/routes/productRoutes.js`, `node --check BE/middleware/uploadMiddleware.js`.
+- Sửa Navbar account: chưa đăng nhập hiện nút Đăng nhập, đăng nhập rồi hiện pill Tài khoản có menu thông tin cá nhân/đăng xuất; admin mới có link Trang quản trị.
+- Khóa route `/admin` bằng `ProtectedRoute`, tài khoản thường hoặc chưa đăng nhập bị chuyển về `/auth`.
+- Gỡ fallback/demo Google/Facebook OAuth; nút OAuth hiện chỉ chạy đăng nhập thật theo credentials trong `.env`, thiếu cấu hình sẽ trả lỗi rõ về `/auth`.
+- Thêm `framer-motion` và hiệu ứng fade-up cho product listing/card/detail.
+- Thêm Smart Search ở Navbar với gợi ý sản phẩm live theo tên, mùi hương và nốt hương.
+- Mở rộng filter sản phẩm theo mùi, khoảng giá, kích thước hũ và search keyword; thêm field `size` cho Product model + admin form.
+- Thêm loading spinner cho đăng nhập/đăng ký và checkout đặt hàng.
+- Gắn đơn hàng với tài khoản khách khi checkout có token; thêm API `GET /api/orders/my` và lịch sử đơn trên trang tài khoản tự refresh khoảng 3 giây/lần.
+- Thêm Review model/API, form đánh giá 1-5 sao, bình luận và upload ảnh thật ở trang chi tiết sản phẩm.
+- Thêm recommendations “Có thể bạn cũng thích...” ở trang chi tiết sản phẩm.
+- Thêm visual polish pass cho mood An Hy: `AmbientMood` nền glow/ánh nến, `ScrollReveal` dùng Framer Motion, hero entrance/breathe, scented wave ở bestsellers, hover product/blog card, shimmer button và hỗ trợ `prefers-reduced-motion`.
+- Rà lại `FE/src`: xóa `AmbientBackground.jsx` dư để không chồng hai lớp nền chuyển động; giữ `AmbientMood` làm ambient layer chính.
+- Sửa lỗi request ảnh failed lặp nhiều lần: đổi fallback ảnh `ProductCard`, `ProductDetail`, search suggestion sang asset local `hero-banner.png`, đồng thời chặn `onError` retry.
+- Sửa responsive mobile hero/nav: thêm class `.hero-scene`, rule riêng cho `700px`/`420px`, giảm kích thước title/hero image/badge/Zalo và bố cục nav/account pill.
+- Cập nhật `/contact`: giữ card Zalo `0946081027` và thêm map đúng địa chỉ `Phường Vĩnh Quang, TP. Rạch Giá, Kiên Giang`.
+- Cải thiện OAuth thật Google/Facebook: xử lý lỗi provider trả về `error`, báo rõ khi callback thiếu `code`, thêm endpoint kiểm tra cấu hình không lộ secret tại `/api/users/oauth/status`.
+- Nâng cấp email thông báo đơn hàng: template HTML pastel An Hy Candle, text fallback, escape dữ liệu khách hàng, hiển thị sản phẩm/tổng tiền/thanh toán/địa chỉ và nhắc kiểm tra chuyển khoản khi khách chọn VietQR. Gmail SMTP đã được cấu hình trong `.env`.
+- Test SMTP Gmail trực tiếp thành công: Gmail nhận test mail, accepted `anhy.2709.0820@gmail.com`. Sửa order API để chờ kết quả gửi mail và trả `emailNotification` là `sent/skipped/failed`; checkout success hiển thị trạng thái email.
+- Sửa template email mobile: thêm HTML meta UTF-8, `encoding: utf-8`, `textEncoding: base64`, chuyển layout sang table 100% max-width 560px, badge thanh toán tự wrap để không bị khuất trên điện thoại. Thêm script `BE/scripts/sendTestOrderEmail.js` để test mail UTF-8 từ file.
+- Sửa lỗi OAuth `next is not a function`: cập nhật hook hash password trong `BE/models/User.js` để user Google/Facebook không có password vẫn lưu được; đã test lưu OAuth user vào MongoDB thành công.
+- Dừng backend cũ đang giữ port 5000 và restart backend từ đúng thư mục `BE`; xác nhận `/api/users/oauth/status` trả cấu hình Google/Facebook OK nên code OAuth mới đã chạy.
+- Tách trang tài khoản khách thành 3 tab/nút: `Thông tin cá nhân`, `Đổi mật khẩu`, `Đơn hàng`; chỉ render panel đang chọn để giao diện gọn hơn.
+- Xóa newsletter card khỏi trang liên hệ, gỡ custom cursor vòng tròn hồng gây rối giao diện và bỏ FAQ freeship theo yêu cầu.

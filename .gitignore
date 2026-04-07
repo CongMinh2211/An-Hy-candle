@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+*.log
+Agent_skill/
+
+# Keep the upload folder structure, but do not commit uploaded product images.
+BE/uploads/products/*
+!BE/uploads/products/.gitkeep
