@@ -43,3 +43,4 @@
 - Gỡ nút đăng nhập nhanh Facebook khỏi frontend theo yêu cầu, giữ Google OAuth và đăng nhập thường.
 - Mở hỗ trợ upload ảnh iPhone HEIC/HEIF cho admin: backend nhận file, frontend không còn chặn và hiển thị placeholder khi trình duyệt không preview được.
 - Cải thiện search/gợi ý sản phẩm: normalize tiếng Việt không dấu để tìm theo tên/mùi/nốt hương/danh mục/kích thước chính xác hơn.
+- Gỡ thanh toán COD khỏi giao diện checkout, giữ VietQR là phương thức thanh toán duy nhất cho khách hàng.

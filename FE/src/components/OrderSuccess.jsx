@@ -64,12 +64,6 @@ const OrderSuccess = ({ order, emailNotification, onConfirmTransfer }) => {
         </div>
       )}
 
-      {order.paymentMethod === 'cod' && (
-        <div style={{ padding: '30px', background: '#f9f9f9', borderRadius: '15px', marginBottom: '40px' }}>
-          <p>Đơn hàng của bạn sẽ được thanh toán khi nhận hàng. Vui lòng giữ liên lạc với số điện thoại <strong>{order.shippingAddress.phone}</strong>.</p>
-        </div>
-      )}
-
       <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
         <Link to="/products" className="btn-premium" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
           Tiếp tục mua sắm <ArrowRight size={20} />

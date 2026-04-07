@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldCheck, QrCode, Banknote } from 'lucide-react';
+import { ShieldCheck, QrCode } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import OrderSuccess from '../components/OrderSuccess';
@@ -8,7 +8,7 @@ import { API_URLS } from '../config/api';
 
 const Checkout = () => {
   const { cartItems, cartTotal, getProductKey, clearCart } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState('qr');
+  const paymentMethod = 'qr';
   const [orderMessage, setOrderMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderData, setOrderData] = useState(null);
@@ -102,37 +102,28 @@ const Checkout = () => {
         </form>
 
         <h3 style={{ fontSize: '1.4rem', marginBottom: '20px' }}>Phương Thức Thanh Toán</h3>
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-          <div 
-            onClick={() => setPaymentMethod('qr')}
-            style={{ 
-              flex: 1, padding: '20px', borderRadius: '12px', border: paymentMethod === 'qr' ? '2px solid var(--color-accent)' : '1px solid #ddd',
-              cursor: 'pointer', textAlign: 'center', background: paymentMethod === 'qr' ? 'rgba(93, 64, 55, 0.05)' : '#fff'
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '24px' }}>
+          <div
+            style={{
+              flex: 1,
+              padding: '20px',
+              borderRadius: '12px',
+              border: '2px solid var(--color-accent)',
+              textAlign: 'center',
+              background: 'rgba(93, 64, 55, 0.05)'
             }}
           >
             <QrCode size={30} style={{ marginBottom: '10px' }} />
             <p style={{ fontWeight: 600, margin: 0 }}>Quét Mã VietQR</p>
           </div>
-          <div 
-            onClick={() => setPaymentMethod('cod')}
-            style={{ 
-              flex: 1, padding: '20px', borderRadius: '12px', border: paymentMethod === 'cod' ? '2px solid var(--color-accent)' : '1px solid #ddd',
-              cursor: 'pointer', textAlign: 'center', background: paymentMethod === 'cod' ? 'rgba(93, 64, 55, 0.05)' : '#fff'
-            }}
-          >
-            <Banknote size={30} style={{ marginBottom: '10px' }} />
-            <p style={{ fontWeight: 600, margin: 0 }}>Thanh Toán COD</p>
-          </div>
         </div>
 
-        {paymentMethod === 'qr' && (
-          <div className="glass-effect" style={{ padding: '30px', textAlign: 'center', marginBottom: '40px' }}>
-            <p style={{ marginBottom: '15px', fontSize: '0.9rem', opacity: 0.8 }}>Vui lòng quét mã bên dưới để thanh toán đơn hàng</p>
-            <img src={qrImage} alt="QR chuyển khoản An Hy Candle" style={{ width: '260px', maxWidth: '100%', borderRadius: '18px', boxShadow: 'var(--soft-shadow)' }} />
-            <p style={{ marginTop: '15px', fontWeight: 600 }}>Thanh toán: {formatPrice(total)}</p>
-            <p style={{ fontSize: '0.9rem', opacity: 0.75 }}>Nội dung chuyển khoản: ANHY + số điện thoại của bạn</p>
-          </div>
-        )}
+        <div className="glass-effect" style={{ padding: '30px', textAlign: 'center', marginBottom: '40px' }}>
+          <p style={{ marginBottom: '15px', fontSize: '0.9rem', opacity: 0.8 }}>Vui lòng quét mã bên dưới để thanh toán đơn hàng</p>
+          <img src={qrImage} alt="QR chuyển khoản An Hy Candle" style={{ width: '260px', maxWidth: '100%', borderRadius: '18px', boxShadow: 'var(--soft-shadow)' }} />
+          <p style={{ marginTop: '15px', fontWeight: 600 }}>Thanh toán: {formatPrice(total)}</p>
+          <p style={{ fontSize: '0.9rem', opacity: 0.75 }}>Nội dung chuyển khoản: ANHY + số điện thoại của bạn</p>
+        </div>
 
         <button form="checkout-form" className="btn-premium" disabled={isSubmitting} style={{ width: '100%', padding: '20px', fontSize: '1.1rem' }}>
           {isSubmitting ? <span className="button-loading"><span className="spinner" /> ĐANG GỬI ĐƠN...</span> : 'HOÀN TẤT ĐẶT HÀNG'}
