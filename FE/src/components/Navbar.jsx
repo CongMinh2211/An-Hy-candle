@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useEffect, useState } from 'react';
 import { fallbackProducts } from '../data/shopData';
 import productFallbackImage from '../assets/hero-banner.png';
+import { API_URLS } from '../config/api';
 
 const productKey = (product) => product._id || product.id;
 
@@ -34,7 +35,7 @@ const Navbar = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch(API_URLS.products);
         const data = response.ok ? await response.json() : [];
         if (data.length) setProducts(data);
       } catch {

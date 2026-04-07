@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import zaloLogo from '../../logozalo.png';
+import { API_URLS } from '../config/api';
 
 const Contact = () => {
   const [message, setMessage] = useState('');
@@ -8,7 +9,7 @@ const Contact = () => {
     event.preventDefault();
     const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      const response = await fetch(API_URLS.contact, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { formatPrice } from '../data/shopData';
+import { API_URLS, API_BASE_URL } from '../config/api';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ const Auth = () => {
 
     try {
       setIsAuthLoading(true);
-      const response = await fetch(`http://localhost:5000/api/users${endpoint}`, {
+      const response = await fetch(`${API_URLS.users}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -79,7 +80,7 @@ const Auth = () => {
     event.preventDefault();
     const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
-      const response = await fetch('http://localhost:5000/api/users/profile', {
+      const response = await fetch(`${API_URLS.users}/profile`, {
         method: 'PUT',
         headers: authHeaders,
         body: JSON.stringify(payload)
@@ -97,7 +98,7 @@ const Auth = () => {
     event.preventDefault();
     const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
     try {
-      const response = await fetch('http://localhost:5000/api/users/password', {
+      const response = await fetch(`${API_URLS.users}/password`, {
         method: 'PUT',
         headers: authHeaders,
         body: JSON.stringify(payload)
@@ -117,7 +118,7 @@ const Auth = () => {
     if (!currentUser?.token || currentUser?.isAdmin) return;
 
     try {
-      const response = await fetch('http://localhost:5000/api/orders/my', {
+      const response = await fetch(`${API_URLS.orders}/my`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       if (response.ok) setOrders(await response.json());
@@ -182,8 +183,8 @@ const Auth = () => {
             {mode === 'login' ? 'Chưa có tài khoản? Đăng ký khách hàng' : 'Đã có tài khoản? Đăng nhập'}
           </button>
           <div className="oauth-row">
-            <a className="outline-button oauth-button" href="http://localhost:5000/api/users/oauth/google">Đăng nhập nhanh Google</a>
-            <a className="outline-button oauth-button" href="http://localhost:5000/api/users/oauth/facebook">Đăng nhập nhanh Facebook</a>
+            <a className="outline-button oauth-button" href={`${API_URLS.users}/oauth/google`}>Đăng nhập nhanh Google</a>
+            <a className="outline-button oauth-button" href={`${API_URLS.users}/oauth/facebook`}>Đăng nhập nhanh Facebook</a>
           </div>
           {message && <p className="form-message">{message}</p>}
         </form>

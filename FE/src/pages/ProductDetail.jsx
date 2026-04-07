@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { fallbackProducts } from '../data/shopData';
 import ProductCard from '../components/ProductCard';
 import productFallbackImage from '../assets/hero-banner.png';
+import { API_URLS } from '../config/api';
 
 const fallbackImage = productFallbackImage;
 const MotionDiv = motion.div;
@@ -65,7 +66,7 @@ const ProductDetail = () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/products/${id}`);
+        const response = await fetch(`${API_URLS.products}/${id}`);
         if (response.ok) {
           setProduct(await response.json());
         }
@@ -87,7 +88,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const loadReviews = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/reviews/product/${productId}`);
+        const response = await fetch(`${API_URLS.reviews}/product/${productId}`);
         if (response.ok) setReviews(await response.json());
       } catch {
         setReviews([]);
@@ -105,7 +106,7 @@ const ProductDetail = () => {
 
     try {
       setIsReviewSubmitting(true);
-      const response = await fetch('http://localhost:5000/api/reviews', {
+      const response = await fetch(API_URLS.reviews, {
         method: 'POST',
         headers: user?.token ? { Authorization: `Bearer ${user.token}` } : {},
         body: formData

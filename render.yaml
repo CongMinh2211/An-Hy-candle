@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: an-hy-candle-backend
+    runtime: node
+    rootDir: BE
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        fromValue: "" # User needs to fill in Render UI
+      - key: JWT_SECRET
+        fromValue: "" # User needs to fill in Render UI
+      - key: ADMIN_SETUP_KEY
+        fromValue: "" # User needs to fill in Render UI
+      - key: EMAIL_USER
+        fromValue: "anhy.2709.0820@gmail.com"
+      - key: EMAIL_PASS
+        fromValue: "" # User needs to fill in Render UI
+      - key: ORDER_NOTIFY_EMAIL
+        fromValue: "anhy.2709.0820@gmail.com"
+      - key: FRONTEND_URL
+        fromValue: "" # User needs to fill in Render UI once Vercel is deployed

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { fallbackProducts } from '../data/shopData';
 import ScrollReveal from './ScrollReveal';
+import { API_URLS } from '../config/api';
 
 const Bestsellers = () => {
   const [products, setProducts] = useState(fallbackProducts.slice(0, 4));
@@ -12,7 +13,7 @@ const Bestsellers = () => {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 1800);
       try {
-        const response = await fetch('http://localhost:5000/api/products', { signal: controller.signal });
+        const response = await fetch(API_URLS.products, { signal: controller.signal });
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         if (data && data.length > 0) {

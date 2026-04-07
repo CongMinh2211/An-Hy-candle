@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 import { fallbackProducts } from '../data/shopData';
+import { API_URLS } from '../config/api';
 
 const MotionDiv = motion.div;
 const MotionHeader = motion.header;
@@ -19,7 +20,7 @@ const ProductListing = () => {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 1800);
       try {
-        const response = await fetch('http://localhost:5000/api/products', { signal: controller.signal });
+        const response = await fetch(API_URLS.products, { signal: controller.signal });
         const data = response.ok ? await response.json() : [];
         if (data.length) setAllProducts(data);
       } catch {

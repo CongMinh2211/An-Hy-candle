@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fallbackProducts, formatPrice } from '../data/shopData';
+import { API_URLS } from '../config/api';
 
 const emptyProduct = {
   name: '',
@@ -38,11 +39,11 @@ const AdminDashboard = () => {
     if (!admin?.isAdmin) return;
 
     const endpoints = [
-      ['products', 'http://localhost:5000/api/products'],
-      ['orders', 'http://localhost:5000/api/orders'],
-      ['users', 'http://localhost:5000/api/users'],
-      ['contacts', 'http://localhost:5000/api/contact'],
-      ['subscribers', 'http://localhost:5000/api/newsletter']
+      ['products', API_URLS.products],
+      ['orders', API_URLS.orders],
+      ['users', API_URLS.users],
+      ['contacts', API_URLS.contact],
+      ['subscribers', API_URLS.newsletter]
     ];
 
     try {
@@ -83,8 +84,8 @@ const AdminDashboard = () => {
     event.preventDefault();
     const isEditing = Boolean(editingProductId);
     const url = isEditing 
-      ? `http://localhost:5000/api/products/${editingProductId}` 
-      : 'http://localhost:5000/api/products';
+      ? `${API_URLS.products}/${editingProductId}` 
+      : API_URLS.products;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
@@ -94,7 +95,7 @@ const AdminDashboard = () => {
         const imageData = new FormData();
         imageData.append('image', selectedImageFile);
 
-        const uploadResponse = await fetch('http://localhost:5000/api/products/upload', {
+        const uploadResponse = await fetch(`${API_URLS.products}/upload`, {
           method: 'POST',
           headers: { Authorization: adminHeaders.Authorization },
           body: imageData
@@ -183,7 +184,7 @@ const AdminDashboard = () => {
     if (!product._id) return;
 
     try {
-      await fetch(`http://localhost:5000/api/products/${product._id}`, { method: 'DELETE', headers: adminHeaders });
+      await fetch(`${API_URLS.products}/${product._id}`, { method: 'DELETE', headers: adminHeaders });
       setMessage('Đã xóa sản phẩm.');
     } catch {
       setMessage('Chưa xóa được trên API, kiểm tra MongoDB/backend.');
@@ -192,7 +193,7 @@ const AdminDashboard = () => {
 
   const updateOrderStatus = async (order, status) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/${order._id}/status`, {
+      const response = await fetch(`${API_URLS.orders}/${order._id}/status`, {
         method: 'PUT',
         headers: adminHeaders,
         body: JSON.stringify({ status, isPaid: order.isPaid })
@@ -222,7 +223,7 @@ const AdminDashboard = () => {
     if (!editingUserId) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${editingUserId}`, {
+      const response = await fetch(`${API_URLS.users}/${editingUserId}`, {
         method: 'PUT',
         headers: adminHeaders,
         body: JSON.stringify(userForm)

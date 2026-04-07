@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { faqs, fallbackPosts } from '../data/shopData';
+import { API_URLS } from '../config/api';
 
 const BlogFAQ = () => {
   const [posts, setPosts] = useState(fallbackPosts);
@@ -8,7 +9,7 @@ const BlogFAQ = () => {
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/blogs');
+        const response = await fetch(API_URLS.blogs);
         const data = response.ok ? await response.json() : [];
         if (data.length) setPosts(data);
       } catch {

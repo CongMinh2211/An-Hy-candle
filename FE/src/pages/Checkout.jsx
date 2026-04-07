@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import OrderSuccess from '../components/OrderSuccess';
 import qrImage from '../../QR.jpg';
+import { API_URLS } from '../config/api';
 
 const Checkout = () => {
   const { cartItems, cartTotal, getProductKey, clearCart } = useCart();
@@ -26,7 +27,7 @@ const Checkout = () => {
 
     try {
       setIsSubmitting(true);
-      const response = await fetch('http://localhost:5000/api/orders', {
+      const response = await fetch(API_URLS.orders, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
