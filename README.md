@@ -35,10 +35,10 @@ Dự án website thương mại điện tử nến thơm cao cấp với phong c
 - [x] **Phân quyền Admin/User**: Middleware JWT bảo vệ route quản trị, user/admin lưu tách riêng trên frontend.
 - [x] **Newsletter**: API lưu email nhận tin.
 - [x] **Email thông báo đơn hàng**: Dùng Nodemailer SMTP, gửi về `anhy.2709.0820@gmail.com` khi cấu hình `EMAIL_USER/EMAIL_PASS`.
-- [x] **Lưu trữ ảnh local**: Admin upload ảnh sản phẩm qua backend, lưu vào `/BE/uploads/products` và lưu URL ảnh vào MongoDB.
+- [x] **Lưu trữ ảnh Cloudinary**: Admin upload ảnh sản phẩm qua backend, backend đẩy ảnh lên Cloudinary và lưu `secure_url` vào MongoDB.
 - [x] **Reviews**: API đánh giá sản phẩm có sao, bình luận và ảnh thật khách upload.
 - [x] **Order history**: Khách đăng nhập đặt hàng sẽ thấy lịch sử đơn và trạng thái cập nhật khi admin đổi.
-- [ ] **Lưu trữ ảnh cloud**: Khi deploy production nên đổi sang Cloudinary/S3/Render Disk để ảnh không mất khi redeploy.
+- [x] **Lưu trữ ảnh cloud**: Đã chuyển upload ảnh sản phẩm sang Cloudinary để ảnh không mất khi redeploy.
 
 ### 3. Quản trị (Admin Dashboard)
 - [x] **CRUD Sản phẩm**: Thêm/Sửa/Xóa nến thơm (tên, mùi, giá, ảnh) trên dashboard, hỗ trợ upload file JPG/PNG/WebP và preview ảnh.
@@ -72,8 +72,8 @@ Dự án website thương mại điện tử nến thơm cao cấp với phong c
   - Có thể kiểm tra backend đang đọc đúng env bằng `http://localhost:5000/api/users/oauth/status` sau khi restart backend.
 - Để gửi email thông báo đơn hàng bằng Gmail, cấu hình `EMAIL_USER` và `EMAIL_PASS` trong `BE/.env` bằng tài khoản Gmail/App Password. Email nhận thông báo là `ORDER_NOTIFY_EMAIL`, hiện dùng `anhy.2709.0820@gmail.com`.
 - Khi khách bấm **Hoàn tất đặt hàng**, backend sẽ lưu đơn vào MongoDB trước, đơn xuất hiện trong Admin Dashboard, sau đó gửi email HTML pastel về Gmail cửa hàng. Nếu SMTP lỗi, đơn vẫn được lưu và backend ghi log lỗi gửi mail.
-- Upload ảnh sản phẩm trong admin hỗ trợ JPG, PNG, WebP. Nếu ảnh chụp từ iPhone là HEIC, hãy chọn/đổi sang JPG, PNG hoặc WebP để trình duyệt hiển thị đúng.
-- Ảnh upload local nằm trong `BE/uploads/products`. Khi deploy Render, cần dùng Persistent Disk hoặc cloud storage như Cloudinary để ảnh vẫn còn sau mỗi lần redeploy.
+- Upload ảnh sản phẩm trong admin hỗ trợ JPG, PNG, WebP và cả HEIC/HEIF từ iPhone. Backend sẽ upload ảnh lên Cloudinary rồi lưu URL cloud vào sản phẩm.
+- Để dùng upload Cloudinary, thêm `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` vào `BE/.env` hoặc Render Environment.
 - Không dùng ảnh remote làm fallback trong `onError`; nếu ảnh upload/URL bị lỗi, UI dùng ảnh local `hero-banner.png` để tránh vòng lặp request và lag DevTools.
 - Để test trạng thái đơn: đăng nhập tài khoản khách, đặt hàng ở checkout, đăng nhập admin `admin/admin123`, vào `/admin` đổi trạng thái đơn sang `Shipped` hoặc `Delivered`, quay lại `/auth` của khách để xem lịch sử đơn tự cập nhật khoảng mỗi 3 giây.
 

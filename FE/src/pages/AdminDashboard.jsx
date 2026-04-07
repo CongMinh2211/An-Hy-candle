@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fallbackProducts, formatPrice } from '../data/shopData';
-import { API_URLS } from '../config/api';
+import { API_BASE_URL, API_URLS } from '../config/api';
+import productFallbackImage from '../assets/hero-banner.png';
 
 const emptyProduct = {
   name: '',
@@ -13,6 +14,20 @@ const emptyProduct = {
   size: 'Medium',
   category: 'Signature',
   inventory: 20
+};
+
+const resolveProductImageUrl = (image) => {
+  if (!image) return productFallbackImage;
+
+  if (image.startsWith('http://localhost:5000')) {
+    return image.replace('http://localhost:5000', API_BASE_URL);
+  }
+
+  if (image.startsWith('/uploads/')) {
+    return `${API_BASE_URL}${image}`;
+  }
+
+  return image;
 };
 
 const AdminDashboard = () => {
@@ -291,7 +306,7 @@ const AdminDashboard = () => {
         <label className="admin-upload">
           <span>Upload ảnh sản phẩm</span>
           <input type="file" accept="image/jpeg,image/png,image/webp,.heic,.heif,image/heic,image/heif" onChange={handleImageFileChange} />
-          <small>Hỗ trợ JPG, PNG, WebP và cả ảnh iPhone HEIC/HEIF.</small>
+          <small>Ảnh sẽ được upload lên Cloudinary. Hỗ trợ JPG, PNG, WebP và cả ảnh iPhone HEIC/HEIF.</small>
         </label>
         <input value={productForm.image} onChange={(e) => { setProductForm({ ...productForm, image: e.target.value }); setImagePreview(e.target.value); }} required={!selectedImageFile} placeholder="Hoặc dán URL hình ảnh" />
         {(imagePreview || selectedImageFile) && (
@@ -317,7 +332,14 @@ const AdminDashboard = () => {
         <h2>Danh sách sản phẩm</h2>
         {products.map((product) => (
           <div className="admin-row" key={product._id || product.id}>
-            <img src={product.image} alt={product.name} />
+            <img
+              src={resolveProductImageUrl(product.image)}
+              alt={product.name}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = productFallbackImage;
+              }}
+            />
             <span>{product.name}</span>
             <span>{formatPrice(product.price)}</span>
             <span>{product.scent}</span>

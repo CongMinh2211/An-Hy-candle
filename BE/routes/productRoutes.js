@@ -1,8 +1,10 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 const Product = require('../models/Product');
 const { protect, admin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
+const { cloudinary, isCloudinaryConfigured } = require('../config/cloudinary');
 
 // @desc    Fetch all products
 // @route   GET /api/products
@@ -20,7 +22,7 @@ router.get('/', async (req, res) => {
 // @route   POST /api/products/upload
 // @access  Private/Admin
 router.post('/upload', protect, admin, (req, res) => {
-  upload.single('image')(req, res, (error) => {
+  upload.single('image')(req, res, async (error) => {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
@@ -29,8 +31,33 @@ router.post('/upload', protect, admin, (req, res) => {
       return res.status(400).json({ message: 'Chưa chọn ảnh sản phẩm.' });
     }
 
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/products/${req.file.filename}`;
-    return res.status(201).json({ imageUrl });
+    if (!isCloudinaryConfigured) {
+      return res.status(500).json({
+        message: 'Cloudinary chưa được cấu hình. Hãy thêm CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY và CLOUDINARY_API_SECRET.'
+      });
+    }
+
+    try {
+      const extension = path.extname(req.file.originalname || '').toLowerCase() || '.jpg';
+      const safeName = path
+        .basename(req.file.originalname || 'anhy-candle', extension)
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+      const result = await cloudinary.uploader.upload(dataUri, {
+        folder: 'an-hy-candle/products',
+        public_id: `${Date.now()}-${safeName || 'product'}`,
+        resource_type: 'image'
+      });
+
+      return res.status(201).json({
+        imageUrl: result.secure_url,
+        publicId: result.public_id
+      });
+    } catch (uploadError) {
+      return res.status(500).json({ message: `Upload Cloudinary thất bại: ${uploadError.message}` });
+    }
   });
 });
 
