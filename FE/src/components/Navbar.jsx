@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { fallbackProducts } from '../data/shopData';
 import productFallbackImage from '../assets/hero-banner.png';
 import { API_URLS } from '../config/api';
+import { buildProductSearchText, normalizeSearchText } from '../utils/search';
 
 const productKey = (product) => product._id || product.id;
 
@@ -46,9 +47,12 @@ const Navbar = () => {
     loadProducts();
   }, []);
 
-  const suggestions = query.trim()
-    ? products
-      .filter((product) => `${product.name} ${product.scent} ${product.notes}`.toLowerCase().includes(query.toLowerCase()))
+  const normalizedQuery = normalizeSearchText(query);
+  const searchableProducts = products.length ? products : fallbackProducts;
+
+  const suggestions = normalizedQuery
+    ? searchableProducts
+      .filter((product) => normalizeSearchText(buildProductSearchText(product)).includes(normalizedQuery))
       .slice(0, 5)
     : [];
 

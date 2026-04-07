@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
 import { fallbackProducts } from '../data/shopData';
 import { API_URLS } from '../config/api';
+import { buildProductSearchText, normalizeSearchText } from '../utils/search';
 
 const MotionDiv = motion.div;
 const MotionHeader = motion.header;
@@ -14,6 +15,7 @@ const ProductListing = () => {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('newest');
   const [allProducts, setAllProducts] = useState(fallbackProducts);
+  const normalizedSearch = normalizeSearchText(search);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -36,7 +38,7 @@ const ProductListing = () => {
   const filteredProducts = allProducts
     .filter((p) => filter === 'All' || p.scent === filter)
     .filter((p) => sizeFilter === 'all' || (p.size || 'Standard') === sizeFilter)
-    .filter((p) => `${p.name} ${p.scent} ${p.notes}`.toLowerCase().includes(search.toLowerCase()))
+    .filter((p) => normalizeSearchText(buildProductSearchText(p)).includes(normalizedSearch))
     .filter((p) => {
       if (priceFilter === 'under300') return p.price < 300000;
       if (priceFilter === '300to350') return p.price >= 300000 && p.price <= 350000;
