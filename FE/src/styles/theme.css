@@ -863,6 +863,21 @@ h1, h2, h3, h4, h5, h6 {
   width: 96px;
 }
 
+.admin-image-placeholder {
+  align-items: center;
+  background: linear-gradient(135deg, #ffe8e1, #fffaf7);
+  border: 1px dashed rgba(223, 139, 99, 0.45);
+  border-radius: 14px;
+  color: var(--color-accent);
+  display: flex;
+  font-size: 1rem;
+  font-weight: 800;
+  height: 96px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  width: 96px;
+}
+
 .product-image-frame {
   background: #fff2ed;
   border-radius: 18px;
@@ -1242,6 +1257,11 @@ nav {
   }
 
   .admin-image-preview img {
+    height: 190px;
+    width: 100%;
+  }
+
+  .admin-image-placeholder {
     height: 190px;
     width: 100%;
   }

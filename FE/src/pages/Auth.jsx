@@ -184,7 +184,6 @@ const Auth = () => {
           </button>
           <div className="oauth-row">
             <a className="outline-button oauth-button" href={`${API_URLS.users}/oauth/google`}>Đăng nhập nhanh Google</a>
-            <a className="outline-button oauth-button" href={`${API_URLS.users}/oauth/facebook`}>Đăng nhập nhanh Facebook</a>
           </div>
           {message && <p className="form-message">{message}</p>}
         </form>

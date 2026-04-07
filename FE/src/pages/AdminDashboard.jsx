@@ -141,18 +141,28 @@ const AdminDashboard = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'];
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const isAllowedType = allowedTypes.includes(file.type);
+    const isAllowedExtension = allowedExtensions.includes(extension);
+
+    if (!isAllowedType && !isAllowedExtension) {
       setSelectedImageFile(null);
       setImagePreview('');
-      setMessage('Ảnh iPhone dạng HEIC không hiển thị ổn trên web. Hãy chọn ảnh JPG, PNG hoặc WebP.');
+      setMessage('Chỉ hỗ trợ ảnh JPG, PNG, WebP, HEIC hoặc HEIF.');
       event.target.value = '';
       return;
     }
 
     setSelectedImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setMessage('');
+    if (['heic', 'heif'].includes(extension) || ['image/heic', 'image/heif'].includes(file.type)) {
+      setImagePreview('');
+      setMessage('Đã nhận ảnh iPhone HEIC/HEIF. Web sẽ upload bình thường, nhưng một số trình duyệt có thể không xem trước được ảnh này.');
+    } else {
+      setImagePreview(URL.createObjectURL(file));
+      setMessage('');
+    }
   };
 
   const startEditProduct = (product) => {
@@ -280,13 +290,17 @@ const AdminDashboard = () => {
         <input value={productForm.notes} onChange={(e) => setProductForm({ ...productForm, notes: e.target.value })} placeholder="Nốt hương" />
         <label className="admin-upload">
           <span>Upload ảnh sản phẩm</span>
-          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageFileChange} />
-          <small>Dùng JPG, PNG hoặc WebP để tránh lỗi ảnh HEIC từ iPhone/Apple.</small>
+          <input type="file" accept="image/jpeg,image/png,image/webp,.heic,.heif,image/heic,image/heif" onChange={handleImageFileChange} />
+          <small>Hỗ trợ JPG, PNG, WebP và cả ảnh iPhone HEIC/HEIF.</small>
         </label>
         <input value={productForm.image} onChange={(e) => { setProductForm({ ...productForm, image: e.target.value }); setImagePreview(e.target.value); }} required={!selectedImageFile} placeholder="Hoặc dán URL hình ảnh" />
-        {imagePreview && (
+        {(imagePreview || selectedImageFile) && (
           <div className="admin-image-preview">
-            <img src={imagePreview} alt="Xem trước sản phẩm" />
+            {imagePreview ? (
+              <img src={imagePreview} alt="Xem trước sản phẩm" />
+            ) : (
+              <div className="admin-image-placeholder">HEIC</div>
+            )}
             <span>{selectedImageFile ? selectedImageFile.name : 'Ảnh hiện tại/URL'}</span>
           </div>
         )}

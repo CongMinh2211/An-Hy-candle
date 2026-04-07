@@ -5,7 +5,8 @@ const multer = require('multer');
 const uploadDir = path.join(__dirname, '..', 'uploads', 'products');
 fs.mkdirSync(uploadDir, { recursive: true });
 
-const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
 
 const storage = multer.diskStorage({
   destination: (_req, _file, callback) => callback(null, uploadDir),
@@ -24,12 +25,16 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, callback) => {
-    if (allowedMimeTypes.includes(file.mimetype)) {
+    const extension = path.extname(file.originalname || '').toLowerCase();
+    const isAllowedMime = allowedMimeTypes.includes(file.mimetype);
+    const isAllowedExtension = allowedExtensions.includes(extension);
+
+    if (isAllowedMime || isAllowedExtension) {
       callback(null, true);
       return;
     }
 
-    callback(new Error('Chỉ hỗ trợ ảnh JPG, PNG hoặc WebP. Nếu ảnh chụp từ iPhone bị HEIC, hãy chọn ảnh JPG/PNG/WebP để web hiển thị đúng.'));
+    callback(new Error('Chỉ hỗ trợ ảnh JPG, PNG, WebP, HEIC hoặc HEIF.'));
   }
 });
 

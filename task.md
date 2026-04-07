@@ -40,3 +40,5 @@
 - Xóa newsletter card khỏi trang liên hệ, gỡ custom cursor vòng tròn hồng gây rối giao diện và bỏ FAQ freeship theo yêu cầu.
 - Thêm route `/` thân thiện cho backend Render để không còn hiện `Cannot GET /` khi mở domain API trực tiếp.
 - Sửa production auth/deploy: frontend fallback sang backend Render thay vì `localhost`, backend OAuth fallback redirect về Vercel, đổi tab title từ `fe` sang `An Hy candle` và thay favicon thương hiệu.
+- Gỡ nút đăng nhập nhanh Facebook khỏi frontend theo yêu cầu, giữ Google OAuth và đăng nhập thường.
+- Mở hỗ trợ upload ảnh iPhone HEIC/HEIF cho admin: backend nhận file, frontend không còn chặn và hiển thị placeholder khi trình duyệt không preview được.
