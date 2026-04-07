@@ -38,3 +38,4 @@
 - Dừng backend cũ đang giữ port 5000 và restart backend từ đúng thư mục `BE`; xác nhận `/api/users/oauth/status` trả cấu hình Google/Facebook OK nên code OAuth mới đã chạy.
 - Tách trang tài khoản khách thành 3 tab/nút: `Thông tin cá nhân`, `Đổi mật khẩu`, `Đơn hàng`; chỉ render panel đang chọn để giao diện gọn hơn.
 - Xóa newsletter card khỏi trang liên hệ, gỡ custom cursor vòng tròn hồng gây rối giao diện và bỏ FAQ freeship theo yêu cầu.
+- Thêm route `/` thân thiện cho backend Render để không còn hiện `Cannot GET /` khi mở domain API trực tiếp.
