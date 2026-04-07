@@ -39,3 +39,4 @@
 - Tách trang tài khoản khách thành 3 tab/nút: `Thông tin cá nhân`, `Đổi mật khẩu`, `Đơn hàng`; chỉ render panel đang chọn để giao diện gọn hơn.
 - Xóa newsletter card khỏi trang liên hệ, gỡ custom cursor vòng tròn hồng gây rối giao diện và bỏ FAQ freeship theo yêu cầu.
 - Thêm route `/` thân thiện cho backend Render để không còn hiện `Cannot GET /` khi mở domain API trực tiếp.
+- Sửa production auth/deploy: frontend fallback sang backend Render thay vì `localhost`, backend OAuth fallback redirect về Vercel, đổi tab title từ `fe` sang `An Hy candle` và thay favicon thương hiệu.
