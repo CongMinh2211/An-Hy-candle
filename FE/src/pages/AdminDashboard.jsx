@@ -16,17 +16,7 @@ const emptyProduct = {
   inventory: 20
 };
 
-const testProductSample = {
-  name: 'Test Mới (Cloud Bloom)',
-  price: '245000',
-  scent: 'Floral',
-  notes: 'Hoa cam, lê trắng, vanilla',
-  description: 'Sản phẩm test để kiểm tra luồng thêm mới bằng URL ảnh ngoài ổn định hơn.',
-  image: 'https://res.cloudinary.com/demo/image/upload/sample.jpg',
-  size: 'Medium',
-  category: 'Test',
-  inventory: 12
-};
+
 
 const readJsonSafely = async (response) => {
   const rawText = await response.text();
@@ -208,13 +198,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const fillTestProduct = () => {
-    setEditingProductId('');
-    setSelectedImageFile(null);
-    setProductForm(testProductSample);
-    setImagePreview(testProductSample.image);
-    setMessage('Đã nạp dữ liệu test mới. Bạn có thể bấm thêm sản phẩm để thử nhanh.');
-  };
+
 
   const startEditProduct = (product) => {
     setEditingProductId(product._id);
@@ -366,11 +350,7 @@ const AdminDashboard = () => {
         <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} required placeholder="Mô tả sản phẩm" />
         <div className="flex-row" style={{ display: 'flex', gap: '10px' }}>
           <button className="btn-premium" type="submit" style={{ flex: 1 }}>{editingProductId ? 'Lưu cập nhật' : 'Thêm sản phẩm'}</button>
-          {!editingProductId && (
-            <button className="outline-button" type="button" onClick={fillTestProduct}>
-              Nạp dữ liệu test
-            </button>
-          )}
+
           {editingProductId && <button className="outline-button" type="button" onClick={() => { setEditingProductId(''); setProductForm(emptyProduct); setSelectedImageFile(null); setImagePreview(''); }}>Hủy</button>}
         </div>
       </form>
