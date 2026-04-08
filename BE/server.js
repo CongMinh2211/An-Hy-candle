@@ -24,7 +24,14 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    cors(corsOptions)(req, res, next);
+    return;
+  }
+
+  next();
+});
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -106,8 +113,8 @@ const startServer = async () => {
     await ensureDefaultAdmin();
   }
 
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on 0.0.0.0:${PORT}`);
   });
 };
 
