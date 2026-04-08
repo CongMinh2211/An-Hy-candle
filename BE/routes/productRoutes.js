@@ -1,10 +1,44 @@
 const express = require('express');
 const path = require('path');
+const { Readable } = require('stream');
 const router = express.Router();
 const Product = require('../models/Product');
 const { protect, admin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 const { cloudinary, isCloudinaryConfigured } = require('../config/cloudinary');
+
+const CLOUDINARY_HOST = 'res.cloudinary.com';
+
+const slugifyForCloudinary = (value) => {
+  return String(value || 'product')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
+const shouldImportRemoteImage = (image) => {
+  if (!image || typeof image !== 'string') return false;
+  const trimmedImage = image.trim();
+
+  if (!/^https?:\/\//i.test(trimmedImage)) return false;
+  if (trimmedImage.includes(CLOUDINARY_HOST)) return false;
+
+  return true;
+};
+
+const importRemoteImageToCloudinary = async (image, name) => {
+  if (!shouldImportRemoteImage(image) || !isCloudinaryConfigured) {
+    return image;
+  }
+
+  const result = await cloudinary.uploader.upload(image, {
+    folder: 'an-hy-candle/products',
+    public_id: `${Date.now()}-${slugifyForCloudinary(name)}`,
+    resource_type: 'image'
+  });
+
+  return result.secure_url;
+};
 
 // @desc    Fetch all products
 // @route   GET /api/products
@@ -44,11 +78,28 @@ router.post('/upload', protect, admin, (req, res) => {
         .toLowerCase()
         .replace(/[^a-z0-9-]+/g, '-')
         .replace(/(^-|-$)/g, '');
-      const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-      const result = await cloudinary.uploader.upload(dataUri, {
-        folder: 'an-hy-candle/products',
-        public_id: `${Date.now()}-${safeName || 'product'}`,
-        resource_type: 'image'
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'an-hy-candle/products',
+            public_id: `${Date.now()}-${safeName || 'product'}`,
+            resource_type: 'image'
+          },
+          (streamError, uploadResult) => {
+            if (streamError) {
+              reject(streamError);
+              return;
+            }
+
+            resolve(uploadResult);
+          }
+        );
+
+        uploadStream.on('error', (err) => {
+          reject(err);
+        });
+
+        Readable.from(req.file.buffer).pipe(uploadStream);
       });
 
       return res.status(201).json({
@@ -82,7 +133,11 @@ router.get('/:id', async (req, res) => {
 // @access  Private/Admin
 router.post('/', protect, admin, async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const payload = {
+      ...req.body,
+      image: await importRemoteImageToCloudinary(req.body.image, req.body.name)
+    };
+    const product = new Product(payload);
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
   } catch (error) {
@@ -95,7 +150,12 @@ router.post('/', protect, admin, async (req, res) => {
 // @access  Private/Admin
 router.put('/:id', protect, admin, async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    const payload = {
+      ...req.body,
+      image: await importRemoteImageToCloudinary(req.body.image, req.body.name)
+    };
+
+    const product = await Product.findByIdAndUpdate(req.params.id, payload, {
       new: true,
       runValidators: true
     });

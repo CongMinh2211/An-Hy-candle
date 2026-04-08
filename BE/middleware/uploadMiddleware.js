@@ -6,8 +6,9 @@ const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // Giảm xuống 5MB để tránh timeout ném lỗi "Load failed" trên Render Nginx
   fileFilter: (_req, file, callback) => {
+
     const extension = path.extname(file.originalname || '').toLowerCase();
     const isAllowedMime = allowedMimeTypes.includes(file.mimetype);
     const isAllowedExtension = allowedExtensions.includes(extension);

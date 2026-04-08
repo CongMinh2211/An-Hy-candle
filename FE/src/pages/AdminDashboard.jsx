@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fallbackProducts, formatPrice } from '../data/shopData';
 import { API_URLS } from '../config/api';
-import { handleProductImageError, resolveProductImageUrl } from '../utils/images';
+import { handleProductImageError, resolveProductImageUrl, compressImage } from '../utils/images';
 
 const emptyProduct = {
   name: '',
@@ -14,6 +14,32 @@ const emptyProduct = {
   size: 'Medium',
   category: 'Signature',
   inventory: 20
+};
+
+const testProductSample = {
+  name: 'Test Mới (Cloud Bloom)',
+  price: '245000',
+  scent: 'Floral',
+  notes: 'Hoa cam, lê trắng, vanilla',
+  description: 'Sản phẩm test để kiểm tra luồng thêm mới bằng URL ảnh ngoài ổn định hơn.',
+  image: 'https://res.cloudinary.com/demo/image/upload/sample.jpg',
+  size: 'Medium',
+  category: 'Test',
+  inventory: 12
+};
+
+const readJsonSafely = async (response) => {
+  const rawText = await response.text();
+
+  if (!rawText) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(rawText);
+  } catch {
+    return { message: rawText };
+  }
 };
 
 const AdminDashboard = () => {
@@ -93,15 +119,18 @@ const AdminDashboard = () => {
       let imageUrl = productForm.image;
 
       if (selectedImageFile) {
+        setMessage('Đang nén và tải ảnh lên (thường mất vài giây)...');
+        const compressedFile = await compressImage(selectedImageFile);
+        
         const imageData = new FormData();
-        imageData.append('image', selectedImageFile);
+        imageData.append('image', compressedFile);
 
         const uploadResponse = await fetch(`${API_URLS.products}/upload`, {
           method: 'POST',
           headers: { Authorization: adminHeaders.Authorization },
           body: imageData
         });
-        const uploadResult = await uploadResponse.json();
+        const uploadResult = await readJsonSafely(uploadResponse);
         if (!uploadResponse.ok) throw new Error(uploadResult.message);
         imageUrl = uploadResult.imageUrl;
       }
@@ -118,7 +147,7 @@ const AdminDashboard = () => {
         headers: adminHeaders,
         body: JSON.stringify(payload)
       });
-      const data = await response.json();
+      const data = await readJsonSafely(response);
       if (!response.ok) throw new Error(data.message);
       
       if (isEditing) {
@@ -134,7 +163,11 @@ const AdminDashboard = () => {
       setSelectedImageFile(null);
       setImagePreview('');
     } catch (error) {
-      setMessage(`Lỗi: ${error.message}`);
+      if (error.message === 'Failed to fetch' || error.message.includes('Load failed')) {
+        setMessage('Lỗi kết nối mạng: Upload quá lâu hoặc server (Render) đang bận. Vui lòng thử lại với ảnh dung lượng nhỏ hơn, hoặc sử dụng URL ảnh ngoài.');
+      } else {
+        setMessage(`Lỗi: ${error.message}`);
+      }
     }
   };
 
@@ -147,11 +180,20 @@ const AdminDashboard = () => {
     const extension = file.name.split('.').pop()?.toLowerCase() || '';
     const isAllowedType = allowedTypes.includes(file.type);
     const isAllowedExtension = allowedExtensions.includes(extension);
+    const maxSizeInBytes = 5 * 1024 * 1024;
 
     if (!isAllowedType && !isAllowedExtension) {
       setSelectedImageFile(null);
       setImagePreview('');
       setMessage('Chỉ hỗ trợ ảnh JPG, PNG, WebP, HEIC hoặc HEIF.');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > maxSizeInBytes) {
+      setSelectedImageFile(null);
+      setImagePreview('');
+      setMessage('Ảnh đang lớn hơn 5MB. Bạn hãy giảm dung lượng ảnh rồi thử lại.');
       event.target.value = '';
       return;
     }
@@ -164,6 +206,14 @@ const AdminDashboard = () => {
       setImagePreview(URL.createObjectURL(file));
       setMessage('');
     }
+  };
+
+  const fillTestProduct = () => {
+    setEditingProductId('');
+    setSelectedImageFile(null);
+    setProductForm(testProductSample);
+    setImagePreview(testProductSample.image);
+    setMessage('Đã nạp dữ liệu test mới. Bạn có thể bấm thêm sản phẩm để thử nhanh.');
   };
 
   const startEditProduct = (product) => {
@@ -292,13 +342,21 @@ const AdminDashboard = () => {
         <label className="admin-upload">
           <span>Upload ảnh sản phẩm</span>
           <input type="file" accept="image/jpeg,image/png,image/webp,.heic,.heif,image/heic,image/heif" onChange={handleImageFileChange} />
-          <small>Ảnh sẽ được upload lên Cloudinary. Hỗ trợ JPG, PNG, WebP và cả ảnh iPhone HEIC/HEIF.</small>
+          <small>Ảnh sẽ được upload lên Cloudinary. Nếu bạn dán URL ảnh ngoài như Unsplash, hệ thống cũng sẽ tự import ảnh đó vào Cloudinary khi lưu sản phẩm.</small>
         </label>
         <input value={productForm.image} onChange={(e) => { setProductForm({ ...productForm, image: e.target.value }); setImagePreview(e.target.value); }} required={!selectedImageFile} placeholder="Hoặc dán URL hình ảnh" />
         {(imagePreview || selectedImageFile) && (
           <div className="admin-image-preview">
             {imagePreview ? (
-              <img src={imagePreview} alt="Xem trước sản phẩm" />
+              <img
+                src={imagePreview}
+                alt="Xem trước sản phẩm"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.style.display = 'none';
+                  setMessage('Trình duyệt này không xem trước được URL ảnh đó, nhưng hệ thống vẫn sẽ thử import ảnh vào Cloudinary khi bạn lưu sản phẩm.');
+                }}
+              />
             ) : (
               <div className="admin-image-placeholder">HEIC</div>
             )}
@@ -308,6 +366,11 @@ const AdminDashboard = () => {
         <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} required placeholder="Mô tả sản phẩm" />
         <div className="flex-row" style={{ display: 'flex', gap: '10px' }}>
           <button className="btn-premium" type="submit" style={{ flex: 1 }}>{editingProductId ? 'Lưu cập nhật' : 'Thêm sản phẩm'}</button>
+          {!editingProductId && (
+            <button className="outline-button" type="button" onClick={fillTestProduct}>
+              Nạp dữ liệu test
+            </button>
+          )}
           {editingProductId && <button className="outline-button" type="button" onClick={() => { setEditingProductId(''); setProductForm(emptyProduct); setSelectedImageFile(null); setImagePreview(''); }}>Hủy</button>}
         </div>
       </form>
