@@ -5,10 +5,9 @@ import { useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { fallbackProducts } from '../data/shopData';
 import ProductCard from '../components/ProductCard';
-import productFallbackImage from '../assets/hero-banner.png';
 import { API_URLS } from '../config/api';
+import { handleProductImageError, resolveProductImageUrl } from '../utils/images';
 
-const fallbackImage = productFallbackImage;
 const MotionDiv = motion.div;
 
 const Accordion = ({ id, title, content, openAccordion, setOpenAccordion }) => {
@@ -78,7 +77,9 @@ const ProductDetail = () => {
     loadProduct();
   }, [fallbackProduct, id]);
 
-  const gallery = [product.image, product.image2, product.image3].filter(Boolean);
+  const gallery = [product.image, product.image2, product.image3]
+    .filter(Boolean)
+    .map((image) => resolveProductImageUrl(image));
   const activeImage = gallery.includes(selectedImage) ? selectedImage : product.image;
   const productId = product._id || product.id || id;
   const recommendations = fallbackProducts
@@ -133,12 +134,9 @@ const ProductDetail = () => {
     >
       <div className="product-image" style={{ flex: 1.2 }}>
         <img 
-          src={activeImage || fallbackImage} 
+          src={resolveProductImageUrl(activeImage || product.image)} 
           alt={product.name} 
-          onError={(event) => {
-            event.currentTarget.onerror = null;
-            event.currentTarget.src = fallbackImage;
-          }}
+          onError={handleProductImageError}
           style={{ 
             width: '100%', 
             borderRadius: 'var(--border-radius)', 
@@ -151,12 +149,9 @@ const ProductDetail = () => {
           {gallery.map((image) => (
             <button key={image} onClick={() => setSelectedImage(image)} className={image === activeImage ? 'active-thumb' : ''}>
               <img
-                src={image || fallbackImage}
+                src={resolveProductImageUrl(image)}
                 alt={`${product.name} thumbnail`}
-                onError={(event) => {
-                  event.currentTarget.onerror = null;
-                  event.currentTarget.src = fallbackImage;
-                }}
+                onError={handleProductImageError}
               />
             </button>
           ))}
@@ -212,7 +207,7 @@ const ProductDetail = () => {
             <div className="review-item" key={review._id}>
               <p className="review-stars">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
               <p>{review.comment}</p>
-              {review.image && <img src={review.image} alt={`Ảnh đánh giá của ${review.userName}`} />}
+              {review.image && <img src={resolveProductImageUrl(review.image)} alt={`Ảnh đánh giá của ${review.userName}`} onError={handleProductImageError} />}
               <strong>- {review.userName}</strong>
             </div>
           ))}

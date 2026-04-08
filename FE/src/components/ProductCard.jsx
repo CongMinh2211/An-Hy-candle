@@ -2,9 +2,7 @@ import { useCart } from '../context/CartContext';
 import { Heart, Wind } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import productFallbackImage from '../assets/hero-banner.png';
-
-const fallbackImage = productFallbackImage;
+import { handleProductImageError, resolveProductImageUrl } from '../utils/images';
 const MotionDiv = motion.div;
 
 const ProductCard = ({ product }) => {
@@ -32,13 +30,10 @@ const ProductCard = ({ product }) => {
     >
       <div className="product-image-frame">
         <img
-          src={product.image || fallbackImage}
+          src={resolveProductImageUrl(product.image)}
           alt={product.name}
           loading="lazy"
-          onError={(event) => {
-            event.currentTarget.onerror = null;
-            event.currentTarget.src = fallbackImage;
-          }}
+          onError={handleProductImageError}
         />
       </div>
       <button

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fallbackProducts, formatPrice } from '../data/shopData';
-import { API_BASE_URL, API_URLS } from '../config/api';
-import productFallbackImage from '../assets/hero-banner.png';
+import { API_URLS } from '../config/api';
+import { handleProductImageError, resolveProductImageUrl } from '../utils/images';
 
 const emptyProduct = {
   name: '',
@@ -14,20 +14,6 @@ const emptyProduct = {
   size: 'Medium',
   category: 'Signature',
   inventory: 20
-};
-
-const resolveProductImageUrl = (image) => {
-  if (!image) return productFallbackImage;
-
-  if (image.startsWith('http://localhost:5000')) {
-    return image.replace('http://localhost:5000', API_BASE_URL);
-  }
-
-  if (image.startsWith('/uploads/')) {
-    return `${API_BASE_URL}${image}`;
-  }
-
-  return image;
 };
 
 const AdminDashboard = () => {
@@ -335,10 +321,7 @@ const AdminDashboard = () => {
             <img
               src={resolveProductImageUrl(product.image)}
               alt={product.name}
-              onError={(event) => {
-                event.currentTarget.onerror = null;
-                event.currentTarget.src = productFallbackImage;
-              }}
+              onError={handleProductImageError}
             />
             <span>{product.name}</span>
             <span>{formatPrice(product.price)}</span>

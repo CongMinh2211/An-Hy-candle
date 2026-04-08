@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useEffect, useState } from 'react';
 import { fallbackProducts } from '../data/shopData';
-import productFallbackImage from '../assets/hero-banner.png';
 import { API_URLS } from '../config/api';
 import { buildProductSearchText, normalizeSearchText } from '../utils/search';
+import { handleProductImageError, resolveProductImageUrl } from '../utils/images';
 
 const productKey = (product) => product._id || product.id;
 
@@ -113,12 +113,9 @@ const Navbar = () => {
                   }}
                 >
                   <img
-                    src={product.image || productFallbackImage}
+                    src={resolveProductImageUrl(product.image)}
                     alt={product.name}
-                    onError={(event) => {
-                      event.currentTarget.onerror = null;
-                      event.currentTarget.src = productFallbackImage;
-                    }}
+                    onError={handleProductImageError}
                   />
                   <span>{product.name}<small>{product.scent} - {product.notes}</small></span>
                 </Link>
