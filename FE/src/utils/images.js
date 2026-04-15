@@ -1,4 +1,4 @@
-import productFallbackImage from '../assets/hero-banner.png';
+import productFallbackImage from '../assets/product-placeholder.svg';
 import { API_BASE_URL } from '../config/api';
 
 export const fallbackProductImage = productFallbackImage;

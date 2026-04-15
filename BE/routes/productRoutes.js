@@ -8,6 +8,9 @@ const upload = require('../middleware/uploadMiddleware');
 const { cloudinary, isCloudinaryConfigured } = require('../config/cloudinary');
 
 const CLOUDINARY_HOST = 'res.cloudinary.com';
+const CLOUDINARY_CLOUD_SEGMENT = process.env.CLOUDINARY_CLOUD_NAME
+  ? `${CLOUDINARY_HOST}/${process.env.CLOUDINARY_CLOUD_NAME}/`
+  : CLOUDINARY_HOST;
 
 const slugifyForCloudinary = (value) => {
   return String(value || 'product')
@@ -16,28 +19,13 @@ const slugifyForCloudinary = (value) => {
     .replace(/(^-|-$)/g, '');
 };
 
-const shouldImportRemoteImage = (image) => {
+const isTrustedProductImage = (image) => {
   if (!image || typeof image !== 'string') return false;
   const trimmedImage = image.trim();
 
-  if (!/^https?:\/\//i.test(trimmedImage)) return false;
-  if (trimmedImage.includes(CLOUDINARY_HOST)) return false;
+  if (!trimmedImage) return false;
 
-  return true;
-};
-
-const importRemoteImageToCloudinary = async (image, name) => {
-  if (!shouldImportRemoteImage(image) || !isCloudinaryConfigured) {
-    return image;
-  }
-
-  const result = await cloudinary.uploader.upload(image, {
-    folder: 'an-hy-candle/products',
-    public_id: `${Date.now()}-${slugifyForCloudinary(name)}`,
-    resource_type: 'image'
-  });
-
-  return result.secure_url;
+  return trimmedImage.includes(CLOUDINARY_CLOUD_SEGMENT);
 };
 
 // @desc    Fetch all products
@@ -133,10 +121,13 @@ router.get('/:id', async (req, res) => {
 // @access  Private/Admin
 router.post('/', protect, admin, async (req, res) => {
   try {
-    const payload = {
-      ...req.body,
-      image: await importRemoteImageToCloudinary(req.body.image, req.body.name)
-    };
+    if (!isTrustedProductImage(req.body.image)) {
+      return res.status(400).json({
+        message: 'Chỉ được dùng ảnh đã upload từ admin lên Cloudinary. Vui lòng chọn file ảnh rồi upload.'
+      });
+    }
+
+    const payload = { ...req.body };
     const product = new Product(payload);
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
@@ -150,10 +141,13 @@ router.post('/', protect, admin, async (req, res) => {
 // @access  Private/Admin
 router.put('/:id', protect, admin, async (req, res) => {
   try {
-    const payload = {
-      ...req.body,
-      image: await importRemoteImageToCloudinary(req.body.image, req.body.name)
-    };
+    if (req.body.image && !isTrustedProductImage(req.body.image)) {
+      return res.status(400).json({
+        message: 'Chỉ được dùng ảnh đã upload từ admin lên Cloudinary. Vui lòng chọn file ảnh rồi upload.'
+      });
+    }
+
+    const payload = { ...req.body };
 
     const product = await Product.findByIdAndUpdate(req.params.id, payload, {
       new: true,

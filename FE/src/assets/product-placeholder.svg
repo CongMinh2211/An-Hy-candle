@@ -1,0 +1,20 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="1000" rx="48" fill="#FFF7F2"/>
+  <rect x="70" y="70" width="660" height="860" rx="36" fill="#FCE5DD"/>
+  <rect x="210" y="180" width="380" height="480" rx="80" fill="#FFFDFB"/>
+  <rect x="265" y="250" width="270" height="270" rx="135" fill="#F5D5CA"/>
+  <rect x="320" y="150" width="160" height="70" rx="35" fill="#E7B9A7"/>
+  <rect x="250" y="585" width="300" height="115" rx="18" fill="#FFF7F2"/>
+  <rect x="305" y="628" width="190" height="16" rx="8" fill="#D9A494"/>
+  <rect x="275" y="726" width="250" height="18" rx="9" fill="#B86F58" fill-opacity="0.35"/>
+  <rect x="234" y="776" width="332" height="18" rx="9" fill="#B86F58" fill-opacity="0.25"/>
+  <rect x="172" y="850" width="456" height="18" rx="9" fill="#B86F58" fill-opacity="0.16"/>
+  <circle cx="400" cy="384" r="66" fill="#FFF2EC"/>
+  <path d="M400 326C388 350 370 368 370 392C370 410 383 424 400 424C417 424 430 410 430 392C430 368 412 350 400 326Z" fill="#D38A6B"/>
+  <text x="400" y="830" text-anchor="middle" fill="#8C5343" font-family="Georgia, serif" font-size="38" font-weight="700">
+    An Hy Candle
+  </text>
+  <text x="400" y="882" text-anchor="middle" fill="#A76B59" font-family="Arial, sans-serif" font-size="26">
+    Anh dang cap nhat hinh san pham
+  </text>
+</svg>

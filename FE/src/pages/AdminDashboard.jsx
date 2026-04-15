@@ -125,6 +125,10 @@ const AdminDashboard = () => {
         imageUrl = uploadResult.imageUrl;
       }
 
+      if (!imageUrl) {
+        throw new Error('Vui lòng upload ảnh sản phẩm từ máy của bạn trước khi lưu.');
+      }
+
       const payload = {
         ...productForm,
         image: imageUrl,
@@ -326,25 +330,20 @@ const AdminDashboard = () => {
         <label className="admin-upload">
           <span>Upload ảnh sản phẩm</span>
           <input type="file" accept="image/jpeg,image/png,image/webp,.heic,.heif,image/heic,image/heif" onChange={handleImageFileChange} />
-          <small>Ảnh sẽ được upload lên Cloudinary. Nếu bạn dán URL ảnh ngoài như Unsplash, hệ thống cũng sẽ tự import ảnh đó vào Cloudinary khi lưu sản phẩm.</small>
+          <small>Chỉ sử dụng ảnh bạn upload từ admin. Hệ thống sẽ lưu ảnh này lên Cloudinary và không còn nhận URL ảnh ngoài.</small>
         </label>
-        <input value={productForm.image} onChange={(e) => { setProductForm({ ...productForm, image: e.target.value }); setImagePreview(e.target.value); }} required={!selectedImageFile} placeholder="Hoặc dán URL hình ảnh" />
         {(imagePreview || selectedImageFile) && (
           <div className="admin-image-preview">
             {imagePreview ? (
               <img
                 src={imagePreview}
                 alt="Xem trước sản phẩm"
-                onError={(event) => {
-                  event.currentTarget.onerror = null;
-                  event.currentTarget.style.display = 'none';
-                  setMessage('Trình duyệt này không xem trước được URL ảnh đó, nhưng hệ thống vẫn sẽ thử import ảnh vào Cloudinary khi bạn lưu sản phẩm.');
-                }}
+                onError={handleProductImageError}
               />
             ) : (
               <div className="admin-image-placeholder">HEIC</div>
             )}
-            <span>{selectedImageFile ? selectedImageFile.name : 'Ảnh hiện tại/URL'}</span>
+            <span>{selectedImageFile ? selectedImageFile.name : 'Ảnh hiện tại'}</span>
           </div>
         )}
         <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} required placeholder="Mô tả sản phẩm" />
