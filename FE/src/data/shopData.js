@@ -1,10 +1,25 @@
+import productImage1 from '../img/1.jpg';
+import productImage2 from '../img/2.jpg';
+import productImage3 from '../img/3.jpg';
+import productImage4 from '../img/4.jpg';
+import productImage5 from '../img/5.jpg';
+import productImage6 from '../img/6.jpg';
+import productImage7 from '../img/7.jpg';
+import productImage8 from '../img/8.jpg';
+import productImage9 from '../img/9.jpg';
+import productImage10 from '../img/10.jpg';
+
 export const fallbackProducts = [
-  { id: 1, name: 'Ấm Áp (Cozy)', price: 320000, scent: 'Woody', size: 'Medium', category: 'Signature', notes: 'Đàn hương, hổ phách, vani', image: 'https://images.unsplash.com/photo-1601362840469-51e4d8d5dfd0?q=80&w=1472&auto=format&fit=crop', description: 'Hương gỗ ấm áp, phù hợp phòng khách và buổi tối thư giãn.' },
-  { id: 2, name: 'Sớm Mai (Daylight)', price: 350000, scent: 'Fresh', size: 'Large', category: 'Signature', notes: 'Cam bergamot, trà xanh, nhài', image: 'https://images.unsplash.com/photo-1596433809252-260c2745dfdd?q=80&w=1471&auto=format&fit=crop', description: 'Hương sáng, sạch và nhẹ nhàng cho góc làm việc.' },
-  { id: 3, name: 'Rừng Khuya (Night Scent)', price: 380000, scent: 'Woody', size: 'Large', category: 'Signature', notes: 'Thông, tuyết tùng, xạ hương', image: 'https://images.unsplash.com/photo-1620023617300-610b2eeed598?q=80&w=1472&auto=format&fit=crop', description: 'Tầng hương trầm, yên tĩnh như khu rừng sau cơn mưa.' },
-  { id: 4, name: 'Oải Hương (Lavender Dream)', price: 290000, scent: 'Floral', size: 'Small', category: 'Relax', notes: 'Oải hương, bạch đàn', image: 'https://images.unsplash.com/photo-1602873145311-bf43f628299a?q=80&w=1470&auto=format&fit=crop', description: 'Mùi thư giãn cho phòng ngủ, đọc sách và thiền nhẹ.' },
-  { id: 5, name: 'Hương Chanh (Lemonade)', price: 260000, scent: 'Citrus', size: 'Small', category: 'Fresh', notes: 'Chanh vàng, bạc hà, vetiver', image: 'https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?q=80&w=1470&auto=format&fit=crop', description: 'Citrus tươi mới cho căn bếp và ban công sáng nắng.' },
-  { id: 6, name: 'Mùa Thu (Autumn)', price: 315000, scent: 'Spice', size: 'Medium', category: 'Cozy', notes: 'Quế, tuyết tùng, mật ong', image: 'https://images.unsplash.com/photo-1608173169720-d62194f1ff34?q=80&w=1460&auto=format&fit=crop', description: 'Hương quế mật ong ấm cúng cho những tối ở nhà.' },
+  { id: 1, name: '3 loại nến ly Trái mới', price: 200000, scent: 'Fresh', size: 'Medium', category: 'Scent Notes', notes: 'Lemon, táo xanh, trái cây', image: productImage1, description: 'Bộ sưu tập trái cây tươi mới, sáng phòng và hợp không gian trẻ trung.' },
+  { id: 2, name: 'Nến Ly Hoa Lan Vanilla', price: 200000, scent: 'Floral', size: 'Medium', category: 'Scent Notes', notes: 'Hoa lan, vanilla, xạ hương', image: productImage2, description: 'Mùi hoa lan mềm, ngọt dịu với nền vanilla dễ chịu cho phòng ngủ và bàn trang điểm.' },
+  { id: 3, name: 'Nến Ly Thảo Mộc', price: 200000, scent: 'Woody', size: 'Medium', category: 'Scent Notes', notes: 'Thảo mộc, gỗ khô, lá xanh', image: productImage3, description: 'Tầng hương thảo mộc khô và gỗ nhẹ, hợp góc đọc sách và làm việc yên tĩnh.' },
+  { id: 4, name: 'Tealight Mix Hương', price: 100000, scent: 'Fresh', size: 'Standard', category: 'Gift Box', notes: 'Vanilla, caramel, dâu, oải hương', image: productImage4, description: 'Hộp 8 viên mix nhiều mùi để thử nhanh nhiều tầng hương trong cùng một set.' },
+  { id: 5, name: 'Nến Tealight (Không Mùi)', price: 110000, scent: 'Fresh', size: 'Standard', category: 'Tealight', notes: 'Không mùi', image: productImage5, description: 'Hộp 25 viên tealight không mùi, phù hợp đèn đốt tinh dầu và setup bàn tiệc.' },
+  { id: 6, name: 'Caramel', price: 200000, scent: 'Spice', size: 'Medium', category: 'Dessert', notes: 'Caramel, bơ ngậy, bánh nướng', image: productImage6, description: 'Mùi caramel ngọt ấm, hợp buổi tối và không gian bếp hoặc quán nhỏ.' },
+  { id: 7, name: 'Blackberry Juice', price: 200000, scent: 'Fresh', size: 'Medium', category: 'Fruit', notes: 'Quả mọng, nho đen, đường nâu', image: productImage7, description: 'Mùi quả mọng đậm, có độ ngọt nhẹ và cảm giác trẻ trung, dễ dùng hằng ngày.' },
+  { id: 8, name: 'Popcorn', price: 220000, scent: 'Spice', size: 'Medium', category: 'Dessert', notes: 'Bắp rang, caramel, kem béo', image: productImage8, description: 'Mùi bắp rang bơ rõ nét, thiên ngọt và rất hợp set quà hoặc decor vui mắt.' },
+  { id: 9, name: 'Layer Cake', price: 200000, scent: 'Floral', size: 'Medium', category: 'Dessert', notes: 'Bánh kem, berry, vanilla', image: productImage9, description: 'Mùi bánh ngọt mềm với lớp berry nhẹ, phù hợp góc chụp ảnh và bàn học.' },
+  { id: 10, name: 'Bông Cúc', price: 15000, scent: 'Floral', size: 'Small', category: 'Phụ kiện', notes: 'Bông cúc', image: productImage10, description: 'Bông cúc trang trí lẻ, giá 15.000đ cho 1 bông.' },
 ];
 
 export const fallbackPosts = [

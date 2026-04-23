@@ -1307,6 +1307,31 @@ nav {
     position: sticky;
   }
 
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-logo img {
+  display: block;
+  max-width: min(220px, 42vw);
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 700px) {
+  .nav-logo img {
+    max-width: min(180px, 46vw);
+  }
+}
+
+@media (max-width: 420px) {
+  .nav-logo img {
+    max-width: min(150px, 44vw);
+  }
+}
+
+@media (max-width: 700px) {
   .nav-logo {
     font-size: 1.25rem !important;
     line-height: 1.1;

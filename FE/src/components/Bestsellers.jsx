@@ -6,27 +6,34 @@ import ScrollReveal from './ScrollReveal';
 import { API_URLS } from '../config/api';
 
 const Bestsellers = () => {
-  const [products, setProducts] = useState(fallbackProducts.slice(0, 4));
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchProducts = async () => {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 1800);
       try {
-        const response = await fetch(API_URLS.products, { signal: controller.signal });
+        const response = await fetch(API_URLS.products);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        if (data && data.length > 0) {
+        if (isMounted && data && data.length > 0) {
           setProducts(data.slice(0, 4));
+        } else if (isMounted) {
+          setProducts(fallbackProducts.slice(0, 4));
         }
       } catch (error) {
-        console.warn('API Fetch failed, using mock data:', error);
-      } finally {
-        clearTimeout(timeout);
+        if (isMounted) {
+          console.warn('API Fetch failed, using mock data:', error);
+          setProducts(fallbackProducts.slice(0, 4));
+        }
       }
     };
 
     fetchProducts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

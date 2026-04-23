@@ -14,28 +14,45 @@ const ProductListing = () => {
   const [sizeFilter, setSizeFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('newest');
-  const [allProducts, setAllProducts] = useState(fallbackProducts);
+  const [allProducts, setAllProducts] = useState([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const normalizedSearch = normalizeSearchText(search);
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadProducts = async () => {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 1800);
       try {
-        const response = await fetch(API_URLS.products, { signal: controller.signal });
+        const response = await fetch(API_URLS.products);
         const data = response.ok ? await response.json() : [];
-        if (data.length) setAllProducts(data);
+        if (!isMounted) return;
+
+        if (data.length) {
+          setAllProducts(data);
+        } else {
+          setAllProducts(fallbackProducts);
+        }
       } catch {
-        setAllProducts(fallbackProducts);
+        if (isMounted) {
+          setAllProducts(fallbackProducts);
+        }
       } finally {
-        clearTimeout(timeout);
+        if (isMounted) {
+          setIsLoadingProducts(false);
+        }
       }
     };
 
     loadProducts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const filteredProducts = allProducts
+  const productSource = allProducts.length ? allProducts : fallbackProducts;
+
+  const filteredProducts = productSource
     .filter((p) => filter === 'All' || p.scent === filter)
     .filter((p) => sizeFilter === 'all' || (p.size || 'Standard') === sizeFilter)
     .filter((p) => normalizeSearchText(buildProductSearchText(p)).includes(normalizedSearch))
@@ -135,6 +152,11 @@ const ProductListing = () => {
         maxWidth: 'var(--max-width)', 
         margin: '0 auto' 
       }}>
+        {isLoadingProducts && (
+          <p style={{ gridColumn: '1 / -1', textAlign: 'center', opacity: 0.7 }}>
+            Đang tải sản phẩm từ An Hy Candle...
+          </p>
+        )}
         {filteredProducts.map((product) => (
           <ProductCard key={product._id || product.id} product={product} />
         ))}

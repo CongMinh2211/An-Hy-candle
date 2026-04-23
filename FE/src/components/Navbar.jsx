@@ -6,6 +6,7 @@ import { fallbackProducts } from '../data/shopData';
 import { API_URLS } from '../config/api';
 import { buildProductSearchText, normalizeSearchText } from '../utils/search';
 import { handleProductImageError, resolveProductImageUrl } from '../utils/images';
+import brandLogo from '../img/logo.jpg';
 
 const productKey = (product) => product._id || product.id;
 
@@ -78,8 +79,17 @@ const Navbar = () => {
       zIndex: 1000,
       borderBottom: '1px solid rgba(0, 0, 0, 0.05)'
     }}>
-      <Link to="/" className="nav-logo" style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '2px', color: 'var(--color-accent)', textDecoration: 'none' }}>
-        AN HY CANDLE
+      <Link to="/" className="nav-logo" style={{ color: 'var(--color-accent)', textDecoration: 'none' }}>
+        <img
+          src={brandLogo}
+          alt="An Hy candle"
+          style={{
+            height: '56px',
+            width: 'auto',
+            display: 'block',
+            objectFit: 'contain'
+          }}
+        />
       </Link>
       
       <div className="nav-links" style={{ display: 'flex', gap: '30px' }}>
