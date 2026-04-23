@@ -2,7 +2,7 @@ import { ChevronDown, Heart, LogOut, Search, User, ShoppingCart } from 'lucide-r
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useEffect, useState } from 'react';
-import { fallbackProducts } from '../data/shopData';
+import { fallbackProducts, mergeCatalogProducts } from '../data/shopData';
 import { API_URLS } from '../config/api';
 import { buildProductSearchText, normalizeSearchText } from '../utils/search';
 import { handleProductImageError, resolveProductImageUrl } from '../utils/images';
@@ -39,7 +39,7 @@ const Navbar = () => {
       try {
         const response = await fetch(API_URLS.products);
         const data = response.ok ? await response.json() : [];
-        if (data.length) setProducts(data);
+        if (data.length) setProducts(mergeCatalogProducts(data));
       } catch {
         setProducts(fallbackProducts);
       }

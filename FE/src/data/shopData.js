@@ -59,3 +59,28 @@ export const faqs = [
 ];
 
 export const formatPrice = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+
+export const getCatalogProductKey = (product = {}) => (
+  String(product.name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .trim()
+);
+
+export const mergeCatalogProducts = (apiProducts = []) => {
+  const apiMap = new Map(
+    apiProducts.map((product) => [getCatalogProductKey(product), product])
+  );
+
+  const fixedCatalog = fallbackProducts.map((product) => (
+    apiMap.get(getCatalogProductKey(product)) || product
+  ));
+
+  const fixedKeys = new Set(fallbackProducts.map((product) => getCatalogProductKey(product)));
+  const customProducts = apiProducts.filter((product) => !fixedKeys.has(getCatalogProductKey(product)));
+
+  return [...fixedCatalog, ...customProducts];
+};

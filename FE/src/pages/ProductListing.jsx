@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
-import { fallbackProducts } from '../data/shopData';
+import { fallbackProducts, mergeCatalogProducts } from '../data/shopData';
 import { API_URLS } from '../config/api';
 import { buildProductSearchText, normalizeSearchText } from '../utils/search';
 
@@ -28,7 +28,7 @@ const ProductListing = () => {
         if (!isMounted) return;
 
         if (data.length) {
-          setAllProducts(data);
+          setAllProducts(mergeCatalogProducts(data));
         } else {
           setAllProducts(fallbackProducts);
         }

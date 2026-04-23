@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
-import { fallbackProducts } from '../data/shopData';
+import { fallbackProducts, mergeCatalogProducts } from '../data/shopData';
 import ScrollReveal from './ScrollReveal';
 import { API_URLS } from '../config/api';
 
@@ -17,7 +17,7 @@ const Bestsellers = () => {
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         if (isMounted && data && data.length > 0) {
-          setProducts(data.slice(0, 4));
+          setProducts(mergeCatalogProducts(data).slice(0, 4));
         } else if (isMounted) {
           setProducts(fallbackProducts.slice(0, 4));
         }

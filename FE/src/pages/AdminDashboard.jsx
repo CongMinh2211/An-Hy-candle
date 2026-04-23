@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { fallbackProducts, formatPrice } from '../data/shopData';
+import { fallbackProducts, formatPrice, mergeCatalogProducts } from '../data/shopData';
 import { API_URLS } from '../config/api';
 import { handleProductImageError, resolveProductImageUrl, compressImage } from '../utils/images';
 
@@ -69,7 +69,7 @@ const AdminDashboard = () => {
       );
       if (productRes.ok) {
         const data = await productRes.json();
-        if (data.length) setProducts(data);
+        setProducts(mergeCatalogProducts(data));
       }
       if (orderRes.ok) setOrders(await orderRes.json());
       if (userRes.ok) setUsers(await userRes.json());
@@ -145,10 +145,12 @@ const AdminDashboard = () => {
       if (!response.ok) throw new Error(data.message);
       
       if (isEditing) {
-        setProducts((items) => items.map(p => (p._id === editingProductId ? data : p)));
+        setProducts((items) => mergeCatalogProducts(items.map((product) => (
+          product._id === editingProductId ? data : product
+        ))));
         setMessage('Đã cập nhật sản phẩm.');
       } else {
-        setProducts((items) => [data, ...items]);
+        setProducts((items) => mergeCatalogProducts([data, ...items]));
         setMessage('Đã thêm sản phẩm mới.');
       }
       
@@ -205,7 +207,7 @@ const AdminDashboard = () => {
 
 
   const startEditProduct = (product) => {
-    setEditingProductId(product._id);
+    setEditingProductId(product._id || '');
     setProductForm({
       name: product.name || '',
       price: product.price || '',
@@ -228,12 +230,14 @@ const AdminDashboard = () => {
       return;
     }
 
-    const id = product._id || product.id;
-    setProducts((items) => items.filter((item) => (item._id || item.id) !== id));
-    if (!product._id) return;
+    if (!product._id) {
+      setMessage('Đây là sản phẩm cố định trong catalog mẫu. Bạn có thể bấm Sửa để tạo bản chỉnh từ admin.');
+      return;
+    }
 
     try {
       await fetch(`${API_URLS.products}/${product._id}`, { method: 'DELETE', headers: adminHeaders });
+      setProducts((items) => mergeCatalogProducts(items.filter((item) => item._id !== product._id)));
       setMessage('Đã xóa sản phẩm.');
     } catch {
       setMessage('Chưa xóa được trên API, kiểm tra MongoDB/backend.');
