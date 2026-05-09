@@ -13,13 +13,17 @@ const Bestsellers = () => {
 
     const fetchProducts = async () => {
       try {
-        const response = await fetch(API_URLS.products);
+        const [response, hiddenResponse] = await Promise.all([
+          fetch(API_URLS.products),
+          fetch(API_URLS.catalogHidden)
+        ]);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
+        const hiddenKeys = hiddenResponse.ok ? await hiddenResponse.json() : [];
         if (isMounted && data && data.length > 0) {
-          setProducts(mergeCatalogProducts(data).slice(0, 4));
+          setProducts(mergeCatalogProducts(data, hiddenKeys).slice(0, 4));
         } else if (isMounted) {
-          setProducts(fallbackProducts.slice(0, 4));
+          setProducts(mergeCatalogProducts([], hiddenKeys).slice(0, 4));
         }
       } catch (error) {
         if (isMounted) {

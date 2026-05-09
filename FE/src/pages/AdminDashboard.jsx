@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { fallbackProducts, formatPrice, mergeCatalogProducts } from '../data/shopData';
+import { fallbackProducts, formatPrice, getCatalogProductKey, mergeCatalogProducts } from '../data/shopData';
 import { API_URLS } from '../config/api';
 import { handleProductImageError, resolveProductImageUrl, compressImage } from '../utils/images';
 
@@ -34,6 +34,7 @@ const readJsonSafely = async (response) => {
 
 const AdminDashboard = () => {
   const [products, setProducts] = useState(fallbackProducts);
+  const [hiddenCatalogKeys, setHiddenCatalogKeys] = useState([]);
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   const [contacts, setContacts] = useState([]);
@@ -64,12 +65,18 @@ const AdminDashboard = () => {
     ];
 
     try {
-      const [productRes, orderRes, userRes, contactRes, subscriberRes] = await Promise.all(
-        endpoints.map(([name, url]) => fetch(url, name === 'products' ? undefined : { headers: adminHeaders }))
+      const [productRes, orderRes, userRes, contactRes, subscriberRes, hiddenRes] = await Promise.all(
+        [
+          ...endpoints.map(([name, url]) => fetch(url, name === 'products' ? undefined : { headers: adminHeaders })),
+          fetch(API_URLS.catalogHidden)
+        ]
       );
+      const hiddenKeys = hiddenRes.ok ? await hiddenRes.json() : [];
+      setHiddenCatalogKeys(hiddenKeys);
+
       if (productRes.ok) {
         const data = await productRes.json();
-        setProducts(mergeCatalogProducts(data));
+        setProducts(mergeCatalogProducts(data, hiddenKeys));
       }
       if (orderRes.ok) setOrders(await orderRes.json());
       if (userRes.ok) setUsers(await userRes.json());
@@ -147,10 +154,10 @@ const AdminDashboard = () => {
       if (isEditing) {
         setProducts((items) => mergeCatalogProducts(items.map((product) => (
           product._id === editingProductId ? data : product
-        ))));
+        )), hiddenCatalogKeys));
         setMessage('Đã cập nhật sản phẩm.');
       } else {
-        setProducts((items) => mergeCatalogProducts([data, ...items]));
+        setProducts((items) => mergeCatalogProducts([data, ...items], hiddenCatalogKeys));
         setMessage('Đã thêm sản phẩm mới.');
       }
       
@@ -230,17 +237,32 @@ const AdminDashboard = () => {
       return;
     }
 
-    if (!product._id) {
-      setMessage('Đây là sản phẩm cố định trong catalog mẫu. Bạn có thể bấm Sửa để tạo bản chỉnh từ admin.');
-      return;
-    }
+    const catalogKey = getCatalogProductKey(product);
 
     try {
-      await fetch(`${API_URLS.products}/${product._id}`, { method: 'DELETE', headers: adminHeaders });
-      setProducts((items) => mergeCatalogProducts(items.filter((item) => item._id !== product._id)));
+      if (product._id) {
+        const response = await fetch(`${API_URLS.products}/${product._id}`, { method: 'DELETE', headers: adminHeaders });
+        const data = await readJsonSafely(response);
+        if (!response.ok) throw new Error(data.message || 'Không xóa được sản phẩm.');
+      }
+
+      const hideResponse = await fetch(API_URLS.catalogHidden, {
+        method: 'POST',
+        headers: adminHeaders,
+        body: JSON.stringify({ key: catalogKey, name: product.name })
+      });
+      const hideData = await readJsonSafely(hideResponse);
+      if (!hideResponse.ok) throw new Error(hideData.message || 'Không ẩn được sản phẩm catalog.');
+
+      const nextHiddenKeys = [...new Set([...hiddenCatalogKeys, catalogKey])];
+      setHiddenCatalogKeys(nextHiddenKeys);
+      setProducts((items) => mergeCatalogProducts(
+        items.filter((item) => getCatalogProductKey(item) !== catalogKey),
+        nextHiddenKeys
+      ));
       setMessage('Đã xóa sản phẩm.');
-    } catch {
-      setMessage('Chưa xóa được trên API, kiểm tra MongoDB/backend.');
+    } catch (error) {
+      setMessage(`Chưa xóa được sản phẩm: ${error.message}`);
     }
   };
 

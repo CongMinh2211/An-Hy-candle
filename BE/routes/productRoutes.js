@@ -3,6 +3,7 @@ const path = require('path');
 const { Readable } = require('stream');
 const router = express.Router();
 const Product = require('../models/Product');
+const CatalogHiddenProduct = require('../models/CatalogHiddenProduct');
 const { protect, admin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 const { cloudinary, isCloudinaryConfigured } = require('../config/cloudinary');
@@ -28,6 +29,16 @@ const isTrustedProductImage = (image) => {
   return trimmedImage.includes(CLOUDINARY_CLOUD_SEGMENT);
 };
 
+const normalizeCatalogKey = (value) => (
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .trim()
+);
+
 // @desc    Fetch all products
 // @route   GET /api/products
 // @access  Public
@@ -35,6 +46,53 @@ router.get('/', async (req, res) => {
   try {
     const products = await Product.find({});
     res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @desc    Fetch hidden fixed catalog keys
+// @route   GET /api/products/catalog-hidden
+// @access  Public
+router.get('/catalog-hidden', async (req, res) => {
+  try {
+    const hiddenProducts = await CatalogHiddenProduct.find({});
+    res.json(hiddenProducts.map((item) => item.key));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @desc    Hide a fixed catalog product
+// @route   POST /api/products/catalog-hidden
+// @access  Private/Admin
+router.post('/catalog-hidden', protect, admin, async (req, res) => {
+  try {
+    const key = normalizeCatalogKey(req.body.key || req.body.name);
+
+    if (!key) {
+      return res.status(400).json({ message: 'Thiếu mã sản phẩm catalog cần ẩn.' });
+    }
+
+    const hiddenProduct = await CatalogHiddenProduct.findOneAndUpdate(
+      { key },
+      { key, name: req.body.name || '' },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+
+    return res.status(201).json(hiddenProduct);
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+});
+
+// @desc    Unhide a fixed catalog product
+// @route   DELETE /api/products/catalog-hidden/:key
+// @access  Private/Admin
+router.delete('/catalog-hidden/:key', protect, admin, async (req, res) => {
+  try {
+    await CatalogHiddenProduct.findOneAndDelete({ key: normalizeCatalogKey(req.params.key) });
+    res.json({ message: 'Đã bỏ ẩn sản phẩm catalog.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

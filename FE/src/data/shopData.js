@@ -70,14 +70,17 @@ export const getCatalogProductKey = (product = {}) => (
     .trim()
 );
 
-export const mergeCatalogProducts = (apiProducts = []) => {
+export const mergeCatalogProducts = (apiProducts = [], hiddenCatalogKeys = []) => {
+  const hiddenKeys = new Set(hiddenCatalogKeys);
   const apiMap = new Map(
     apiProducts.map((product) => [getCatalogProductKey(product), product])
   );
 
-  const fixedCatalog = fallbackProducts.map((product) => (
-    apiMap.get(getCatalogProductKey(product)) || product
-  ));
+  const fixedCatalog = fallbackProducts
+    .filter((product) => !hiddenKeys.has(getCatalogProductKey(product)))
+    .map((product) => (
+      apiMap.get(getCatalogProductKey(product)) || product
+    ));
 
   const fixedKeys = new Set(fallbackProducts.map((product) => getCatalogProductKey(product)));
   const customProducts = apiProducts.filter((product) => !fixedKeys.has(getCatalogProductKey(product)));

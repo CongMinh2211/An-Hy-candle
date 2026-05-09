@@ -23,14 +23,18 @@ const ProductListing = () => {
 
     const loadProducts = async () => {
       try {
-        const response = await fetch(API_URLS.products);
+        const [response, hiddenResponse] = await Promise.all([
+          fetch(API_URLS.products),
+          fetch(API_URLS.catalogHidden)
+        ]);
         const data = response.ok ? await response.json() : [];
+        const hiddenKeys = hiddenResponse.ok ? await hiddenResponse.json() : [];
         if (!isMounted) return;
 
         if (data.length) {
-          setAllProducts(mergeCatalogProducts(data));
+          setAllProducts(mergeCatalogProducts(data, hiddenKeys));
         } else {
-          setAllProducts(fallbackProducts);
+          setAllProducts(mergeCatalogProducts([], hiddenKeys));
         }
       } catch {
         if (isMounted) {

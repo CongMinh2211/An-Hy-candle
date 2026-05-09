@@ -6,6 +6,7 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || fallbackApiUrl;
 
 export const API_URLS = {
   products: `${API_BASE_URL}/api/products`,
+  catalogHidden: `${API_BASE_URL}/api/products/catalog-hidden`,
   orders: `${API_BASE_URL}/api/orders`,
   users: `${API_BASE_URL}/api/users`,
   reviews: `${API_BASE_URL}/api/reviews`,

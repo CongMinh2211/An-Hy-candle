@@ -37,9 +37,13 @@ const Navbar = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await fetch(API_URLS.products);
+        const [response, hiddenResponse] = await Promise.all([
+          fetch(API_URLS.products),
+          fetch(API_URLS.catalogHidden)
+        ]);
         const data = response.ok ? await response.json() : [];
-        if (data.length) setProducts(mergeCatalogProducts(data));
+        const hiddenKeys = hiddenResponse.ok ? await hiddenResponse.json() : [];
+        setProducts(data.length ? mergeCatalogProducts(data, hiddenKeys) : mergeCatalogProducts([], hiddenKeys));
       } catch {
         setProducts(fallbackProducts);
       }
