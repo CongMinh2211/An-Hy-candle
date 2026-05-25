@@ -16,7 +16,7 @@ const emptyProduct = {
   inventory: 20
 };
 
-
+const fixedCatalogKeys = new Set(fallbackProducts.map((product) => getCatalogProductKey(product)));
 
 const readJsonSafely = async (response) => {
   const rawText = await response.text();
@@ -238,6 +238,7 @@ const AdminDashboard = () => {
     }
 
     const catalogKey = getCatalogProductKey(product);
+    const isFixedCatalogProduct = fixedCatalogKeys.has(catalogKey);
 
     try {
       if (product._id) {
@@ -246,15 +247,19 @@ const AdminDashboard = () => {
         if (!response.ok) throw new Error(data.message || 'Không xóa được sản phẩm.');
       }
 
-      const hideResponse = await fetch(API_URLS.catalogHidden, {
-        method: 'POST',
-        headers: adminHeaders,
-        body: JSON.stringify({ key: catalogKey, name: product.name })
-      });
-      const hideData = await readJsonSafely(hideResponse);
-      if (!hideResponse.ok) throw new Error(hideData.message || 'Không ẩn được sản phẩm catalog.');
+      if (isFixedCatalogProduct) {
+        const hideResponse = await fetch(API_URLS.catalogHidden, {
+          method: 'POST',
+          headers: adminHeaders,
+          body: JSON.stringify({ key: catalogKey, name: product.name })
+        });
+        const hideData = await readJsonSafely(hideResponse);
+        if (!hideResponse.ok) throw new Error(hideData.message || 'Không ẩn được sản phẩm catalog.');
+      }
 
-      const nextHiddenKeys = [...new Set([...hiddenCatalogKeys, catalogKey])];
+      const nextHiddenKeys = isFixedCatalogProduct
+        ? [...new Set([...hiddenCatalogKeys, catalogKey])]
+        : hiddenCatalogKeys;
       setHiddenCatalogKeys(nextHiddenKeys);
       setProducts((items) => mergeCatalogProducts(
         items.filter((item) => getCatalogProductKey(item) !== catalogKey),
