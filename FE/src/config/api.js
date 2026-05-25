@@ -1,8 +1,12 @@
 const fallbackApiUrl = import.meta.env.PROD
   ? 'https://an-hy-candle.onrender.com'
   : 'http://localhost:5000';
+const configuredApiUrl = import.meta.env.VITE_API_URL;
+const isVercelFrontendUrl = configuredApiUrl?.includes('an-hy-candle.vercel.app');
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || fallbackApiUrl;
+export const API_BASE_URL = configuredApiUrl && !isVercelFrontendUrl
+  ? configuredApiUrl
+  : fallbackApiUrl;
 
 export const API_URLS = {
   products: `${API_BASE_URL}/api/products`,
